@@ -33,7 +33,7 @@ and looks like it might be a bit of work.
 ##### Cool feature:
 * Specify colors with names or web hex values.  Requires that python "webcolors"
 package is installed.  (Easily done via pip, easy_install, or apt-get, etc.)
- See the following for valid color names: http://www.w3schools.com/html/html_colornames.asp
+ See the following for valid color names: http://www.w3schootimerls.com/html/html_colornames.asp
 
 """
 import socket

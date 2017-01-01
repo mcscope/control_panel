@@ -5,7 +5,7 @@ strobe_state = False
 jump_state = False
 color_memory = []
 force = False
-delay = 0.1
+delay = 100
 # get the IP addresses of the controllers on your local network
 
 bulbs = {}
@@ -56,20 +56,22 @@ def set_colors(colors):
         print("Handle IP [{}]:".format(ip))
         if not force and (memory and color == memory[0]):
             # todo this is an important line - it controls the texture of tails
-            memory = [color] + memory[:4]
+            memory.insert(0, color)
+            del memory[5:]
             continue
         try:
 
             bulb = get_bulb(ip)
-            memory = [color] + memory[:4]
             # use mutation operations to save this.
-
             memory.insert(0, color)
+            print(memory)
             del memory[5:]
             if jump_state:
+                print('jump')
                 bulb.setCustomPattern(memory, delay, 'jump')
             elif strobe_state:
-                bulb.setCustomPattern(memory, delay, 'gradual')
+                print('strobe')
+                bulb.setCustomPattern(memory, delay, 'strobe')
             else:
                 bulb.setRgb(*color)
 
@@ -86,12 +88,19 @@ def number_of_lights():
 
 
 def main():
+    global jump_state
     search_for_lights()
+    strobe_state = True
+    print(f" found {number_of_lights()} leds!")
     set_colors([[255, 0, 0] for _ in ips])
     time.sleep(0.5)
     set_colors([[0, 255, 0] for _ in ips])
     time.sleep(0.5)
     set_colors([[0, 0, 255] for _ in ips])
+    time.sleep(0.5)
+    set_colors([[255, 255, 0] for _ in ips])
+    time.sleep(0.5)
+    set_colors([[0, 255, 255] for _ in ips])
 
 if __name__ == '__main__':
     main()
