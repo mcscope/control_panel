@@ -1,12 +1,15 @@
 import Sasha_code.flux_led_v3 as flux_led
 import time
-ips = []
+import colorsys
+
+ips = ['test']
 strobe_state = False
 jump_state = False
 color_memory = []
 force = False
 delay = 100
 # get the IP addresses of the controllers on your local network
+GLOBAL_BRIGHTNESS = 0.1
 
 bulbs = {}
 
@@ -53,6 +56,11 @@ def set_colors(colors):
         return
 
     for color, ip, memory in zip(colors, ips, color_memory):
+        color = [val % 255 for val in color]
+        h, s, v = colorsys.rgb_to_hsv(*color)
+        color = colorsys.hsv_to_rgb(h, s, v * GLOBAL_BRIGHTNESS)
+        color = [int(val) for val in color]
+
         print("Handle IP [{}]:".format(ip))
         if not force and (memory and color == memory[0]):
             # todo this is an important line - it controls the texture of tails
