@@ -8,8 +8,9 @@ from utils import flatten
 class BaseScheme(object):
 
     def __init__(self):
+        light_control.search_for_lights()
         self.memory = [[255, 255, 255]
-                       for _ in range(light_control.number_of_lights)]
+                       for _ in range(light_control.number_of_lights())]
 
     def set_light_pattern_from_knife(self, state):
         if state.knife_up:
@@ -44,12 +45,12 @@ class BaseScheme(object):
                 hsv_to_rgb(random.randint(x) / 100,
                            random.randint(x) / 100,
                            random.randint(x) / 100)
-                for x in range(light_control.number_of_lights)]
+                for x in range(light_control.number_of_lights())]
 
             light_control.set_colors(self.memory)
         for x in range(50):
             color = [0, 0, 0] if x % 2 == 0 else [255, 255, 255]
-            self.memory = [color for x in range(light_control.number_of_lights)]
+            self.memory = [color for x in range(light_control.number_of_lights())]
             light_control.set_colors(self.memory)
             time.sleep(x / 10.0)
 
@@ -64,7 +65,7 @@ class BaseScheme(object):
         for x in range(100):
             color = hsv_to_rgb(x / 100)
             self.memory = [color
-                           for x in range(light_control.number_of_lights)]
+                           for x in range(light_control.number_of_lights())]
             light_control.set_colors(self.memory)
 
         time.sleep(5)
@@ -80,7 +81,7 @@ class BaseScheme(object):
     def _draw(self, state):
         h, s, v = state.slide, state.minipot, state.megapot
         rgb = hsv_to_rgb(h, s, v)
-        flat_toggles = flatten(state.toggles)[:light_control.number_of_lights]
+        flat_toggles = flatten(state.toggles)[:light_control.number_of_lights()]
         for idx, tog in enumerate(flat_toggles):
             if tog:
                 self.memory[idx] = rgb
@@ -98,14 +99,15 @@ class SimonScheme(object):
         self.wanted_toggles = [random.choice(1, 0) for _ in range(25)]
 
     def __init__(self):
+        light_control.search_for_lights()
         self.memory = [[255, 0, 0]
-                       for _ in range(light_control.number_of_lights)]
+                       for _ in range(light_control.number_of_lights())]
         self.randomize_wanted_toggles()
 
     def _draw(self, state):
         h, s, v = state.slide, state.minipot, state.megapot
         rgb = hsv_to_rgb(h, s, v)
-        flat_toggles = flatten(state.toggles)[:light_control.number_of_lights]
+        flat_toggles = flatten(state.toggles)[:light_control.number_of_lights()]
         perfect = True
         for idx, tog in enumerate(flat_toggles):
             if tog == self.wanted_toggles[idx]:

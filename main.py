@@ -1,5 +1,7 @@
-from control_panel import init_pins, Kind, controls, interpret_controls
+from control_panel import init_pins, Kind, controls
+from control_panel import read_controls, interpret_controls
 from schemes import BaseScheme, SimonScheme
+
 import time
 
 scheme_ranges = [
@@ -16,7 +18,6 @@ def determine_selected_scheme(state):
 def main():
     cur_scheme = BaseScheme()
     init_pins()
-
     control_states = [
         0.0 if control.kind == Kind.ANALOG else False
         for control in controls]

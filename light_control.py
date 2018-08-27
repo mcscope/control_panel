@@ -19,6 +19,7 @@ def get_bulb(ip):
 
 
 def search_for_lights():
+
     global ips, color_memory
     try:
         scanner = flux_led.BulbScanner()
@@ -32,11 +33,15 @@ def search_for_lights():
         print('Found {} controllers'.format(len(addrs)))
         ips = addrs
         color_memory = [[] for _ in range(len(ips))]
-    except:
+    except Exception as e:
+
+        import traceback
+        traceback.print_stack()
+
         # quit so that I don't hold port 48899. if that doesn't work:
         # sudo lsof -i:48899
         # sudo kill -9 <pid>
-        quit()
+        # quit()
 
 
 def set_colors(colors):
@@ -77,5 +82,3 @@ def set_colors(colors):
 
 def number_of_lights():
     return len(ips)
-
-search_for_lights()

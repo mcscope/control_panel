@@ -1,8 +1,14 @@
 from collections import namedtuple
-import RPi.GPIO as gpio
+try:
+    import RPi.GPIO as gpio
+    import serial
+except ImportError:
+    print("Mocking out raspberry pi libraries")
+    import unittest.mock
+    gpio = unittest.mock.Mock()
+    serial = unittest.mock.Mock()
 from enum import Enum
 import time
-import serial
 from utils import dictobj
 ser = serial.Serial('/dev/ttyUSB0', 9600)
 
@@ -102,7 +108,7 @@ def read_controls():
             if second_split is not None:
                 split_seg = split_seg[second_split]
             val = int(split_seg)
-        else if control.pin is not None:
+        elif control.pin is not None:
             val = gpio.input(control.pin)
         states.append(val)
     return states
