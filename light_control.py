@@ -36,7 +36,7 @@ def search_for_lights():
     except Exception as e:
 
         import traceback
-        traceback.print_stack()
+        traceback.print_exc()
 
         # quit so that I don't hold port 48899. if that doesn't work:
         # sudo lsof -i:48899
@@ -54,17 +54,18 @@ def set_colors(colors):
 
     for color, ip, memory in zip(colors, ips, color_memory):
         print("Handle IP [{}]:".format(ip))
-        if not force and color == memory[0]:
+        if not force and (memory and color == memory[0]):
+            # todo this is an important line - it controls the texture of tails
+            memory = [color] + memory[:4]
             continue
         try:
 
             bulb = get_bulb(ip)
             memory = [color] + memory[:4]
-            # todo when the knife switch is set it changes the way the light goes
-            # this module should keep a color 'memory' that it plays
-            # todo delay should be controllable
-            # todo keep color memory
-            # todo don't update needlessly if no change, to allow states to play
+            # use mutation operations to save this.
+
+            memory.insert(0, color)
+            del memory[5:]
             if jump_state:
                 bulb.setCustomPattern(memory, delay, 'jump')
             elif strobe_state:
@@ -82,3 +83,15 @@ def set_colors(colors):
 
 def number_of_lights():
     return len(ips)
+
+
+def main():
+    search_for_lights()
+    set_colors([[255, 0, 0] for _ in ips])
+    time.sleep(0.5)
+    set_colors([[0, 255, 0] for _ in ips])
+    time.sleep(0.5)
+    set_colors([[0, 0, 255] for _ in ips])
+
+if __name__ == '__main__':
+    main()

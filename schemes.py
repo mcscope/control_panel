@@ -3,6 +3,7 @@ import random
 import light_control
 from colorsys import hsv_to_rgb
 from utils import flatten
+from lib.perlin import gen_perlin
 
 
 class BaseScheme(object):
@@ -89,7 +90,7 @@ class BaseScheme(object):
         light_control.set_colors(self.memory)
 
 
-class SimonScheme(object):
+class SimonScheme(BaseScheme):
     """
     Only correctly illuminate the toggles that are in the state that the
     computer has decided it wants. The others will be red
@@ -99,7 +100,7 @@ class SimonScheme(object):
         self.wanted_toggles = [random.choice(1, 0) for _ in range(25)]
 
     def __init__(self):
-        light_control.search_for_lights()
+        super(SimonScheme, self).__init__()
         self.memory = [[255, 0, 0]
                        for _ in range(light_control.number_of_lights())]
         self.randomize_wanted_toggles()
@@ -121,3 +122,17 @@ class SimonScheme(object):
         if perfect:
             self.celebrate_animation()
             self.randomize_wanted_toggles()
+
+
+class PerlinScheme(BaseScheme):
+    # TODO how is this meaningfully controlled, say by 'toggles'
+    def __init__(self):
+        super(PerlinScheme, self).__init__()
+        self.gen = [gen_perlin(), gen_perlin(), gen_perlin()]
+
+    def _draw(self, state):
+        choice = random.randint(self.light_control.number_of_lights())
+        rgen, ggen, bgen = self.gen
+        new_color = [rgen.next(), ggen.next(), bgen.next()]
+        self.memory[choice] = new_color
+        light_control.set_colors(self.memory)
