@@ -21,7 +21,7 @@ ser = serial.Serial('/dev/ttyUSB0', 9600)
 # TODO make sure analog assignments are correct
 #todo actually turn on leds
 
-DEBOUNCE_DELTA = 0.05
+DEBOUNCE_DELTA = 5
 
 
 class Kind(Enum):
@@ -160,11 +160,11 @@ def debounce(fresh_states, existing_states):
     """
     if not existing_states:
         return
-    for control in ANALOG_CONTROLS:
-        delta = fresh_states[control.name] - existing_states[control.name]
-        if abs(delta) < DEBOUNCE_DELTA:
-            fresh_states[control.name] = existing_states[control.name]
-
+    for idx, (control, e,f) in enumerate(zip(CONTROLS, existing_states, fresh_states)):
+        if control.kind==Kind.ANALOG and abs(e-f) < DEBOUNCE_DELTA:
+            # mutate
+            fresh_states[idx] = e
+    return fresh_states
 
 def main():
     init_pins()
@@ -174,10 +174,10 @@ def main():
         for control in CONTROLS]
 
     while True:
-        new_states = read_controls()
+        new_states = debounce(read_controls(), control_states)
         for control, state, new_state in zip(CONTROLS, control_states, new_states):
             if state != new_state:
-                print(f"control {control.name} changed states from {oldval} to {val}")
+                print(f"control {control.name} changed states from {state} to {new_state}")
         control_states = new_states
         time.sleep(0.05)
 
